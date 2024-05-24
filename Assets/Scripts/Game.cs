@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
@@ -13,18 +14,37 @@ public class Game : MonoBehaviour
     [SerializeField] private GameTimer gameTimer;
     [SerializeField] private int pencilSpeed;
     [SerializeField] private int strikeBoost;
+    [SerializeField] private int pencilsCount;
+    [SerializeField] private Vector3 pencilsOffset;
+    [SerializeField] private Vector3 spawnPosition;
 
-    private static readonly Vector3 EMPTY_IMPUT = new();
+    [SerializeField] private float endPositionY;
 
-    private GameObject currentPencil;
+    private List<GameObject> pencils;
 
     private int currentArrow;
 
     private void Start()
     {
+        pencils = new List<GameObject>();
+        CreatePencils();
+
         gameTimer.StartTimer();
         StartCoroutine(ChangeArrow());
-        currentPencil = Instantiate(pencilPrefab, pencilsContainer.transform);
+    }
+
+    private void CreatePencils()
+    {
+        var currentPencilOffset = new Vector3();
+        for (int i = 0; i < pencilsCount; i++)
+        {
+            var pencil = Instantiate(pencilPrefab, pencilsContainer.transform);
+
+            pencil.transform.localPosition = spawnPosition + currentPencilOffset;
+            currentPencilOffset += pencilsOffset;
+
+            pencils.Add(pencil);
+        }
     }
 
     private IEnumerator ChangeArrow()
@@ -43,7 +63,7 @@ public class Game : MonoBehaviour
         var direction = inputValue.Get<Vector3>();
         Debug.Log(direction);
 
-        if (direction == EMPTY_IMPUT)
+        if (direction == Vector3.zero)
             return;
 
         if (direction != arrows[currentArrow].Direction)
@@ -54,10 +74,23 @@ public class Game : MonoBehaviour
 
         arrowsStrike += strikeBoost;
         Debug.Log(arrowsStrike);
-        var position = currentPencil.transform.position;
 
-        position.y += pencilSpeed + (float)arrowsStrike / 10;
-        currentPencil.transform.position = position;
+        for (int i = 0; i < pencils.Count; i++)
+        {
+            var currentPencil = pencils[i];
+            var position = currentPencil.transform.position;
+
+            position.y += pencilSpeed + (float)arrowsStrike / 10;
+            currentPencil.transform.position = position;
+
+            if (currentPencil.transform.localPosition.y < endPositionY) continue;
+
+            Destroy(currentPencil);
+            pencils.Remove(currentPencil);
+
+            if (pencils.Count < 1)
+                OnGameEnd();
+        }
     }
 
     private void HideArrows()
@@ -66,5 +99,9 @@ public class Game : MonoBehaviour
         {
             arrow.GameObject.SetActive(false);
         }
+    }
+
+    private void OnGameEnd()
+    {
     }
 }
