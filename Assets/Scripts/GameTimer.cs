@@ -7,12 +7,7 @@ public class GameTimer : MonoBehaviour
 {
     [SerializeField] private TMP_Text _timerText;
     private DateTime _startTime;
-
-    private void Start()
-    {
-        StartTimer();
-    }
-
+    
     public void StartTimer()
     {
         _startTime = DateTime.Now;
