@@ -18,6 +18,10 @@ public class Game : MonoBehaviour
     [SerializeField] private Vector3 pencilsOffset;
     [SerializeField] private Vector3 spawnPosition;
 
+    [SerializeField] private GameType gameType;
+    [SerializeField] private int lives;
+    private int _lives;
+
     [SerializeField] private float endPositionY;
 
     private List<GameObject> pencils;
@@ -26,6 +30,8 @@ public class Game : MonoBehaviour
 
     private void Start()
     {
+        _lives = lives;
+
         pencils = new List<GameObject>();
         CreatePencils();
 
@@ -68,6 +74,7 @@ public class Game : MonoBehaviour
 
         if (direction != arrows[currentArrow].Direction)
         {
+            _lives--;
             arrowsStrike = 0;
             return;
         }
@@ -88,8 +95,10 @@ public class Game : MonoBehaviour
             Destroy(currentPencil);
             pencils.Remove(currentPencil);
 
-            if (pencils.Count < 1)
+            if (pencils.Count < 1 || (gameType == GameType.WithLives && _lives < 1))
+            {
                 OnGameEnd();
+            }
         }
     }
 
