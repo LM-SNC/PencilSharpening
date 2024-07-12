@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +19,7 @@ public class Game : MonoBehaviour
     [SerializeField] private Vector3 pencilsOffset;
     [SerializeField] private Vector3 spawnPosition;
 
-    [SerializeField] private GameType gameType;
+    public GameType GameType;
     [SerializeField] private int lives;
     private int _lives;
 
@@ -28,7 +29,7 @@ public class Game : MonoBehaviour
 
     private int currentArrow;
 
-    private void Start()
+    private void StartGame()
     {
         _lives = lives;
 
@@ -64,6 +65,11 @@ public class Game : MonoBehaviour
         }
     }
 
+    // private void Update()
+    // {
+    //     currentPencil.transform.position = position;
+    // }
+
     public void OnSlide(InputValue inputValue)
     {
         var direction = inputValue.Get<Vector3>();
@@ -95,7 +101,7 @@ public class Game : MonoBehaviour
             Destroy(currentPencil);
             pencils.Remove(currentPencil);
 
-            if (pencils.Count < 1 || (gameType == GameType.WithLives && _lives < 1))
+            if (pencils.Count < 1 || (GameType == GameType.WithLives && _lives < 1))
             {
                 OnGameEnd();
             }

@@ -1,5 +1,5 @@
 ﻿public enum GameType
 {
-    Default,
-    WithLives
+    Default = 0,
+    WithLives = 1
 }
